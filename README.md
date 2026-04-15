@@ -50,11 +50,23 @@ airflow standalone
 
 Vamos utilizar a fonte de dados da  Kaggle https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce, os CSVs foram baixados e inseridos na pasta `/raw_source`, dela vamos implementar a captura em batch pegando dados diarios (para simular a ingestão).
 
-## Processamento com Airflow e Spark
-### 1. Camada Bronze
-Para que o python tenha acesso aos parâmetros do Airflow, devemos utilizar o args da lib nativa do python `sys`. Um exemplo de uso:
+## 🛠️ Fase 1: Ingestão de Dados (Landing ➡️ Bronze)
+
+Para este projeto, estamos utilizando o **Brazilian E-Commerce Public Dataset by Olist** (Kaggle). O objetivo desta fase é simular um ambiente de produção diário (Batch Processing).v
+
+
+### 1. O Motor de Processamento (Apache Spark)
+O primeiro script PySpark (`scripts/01_ingestao_bronze_pedidos.py`) atua da seguinte forma:
+* Recebe uma data alvo como parâmetro externo (feita para o airflow).
+* Lê os dados brutos (CSV) da área de *Landing* (`raw_source`).
+* Filtra os pedidos específicos daquela data.
+* Adiciona metadados de governança (`_data_ingestao`).
+* Salva os dados na camada **Bronze** em formato **Parquet**.
+* Para otimização os dados são salvos utilizando particionamento dinâmico por data (`partitionBy("data_compra")`).
+
+### 2. A Orquestração (Apache Airflow)
+A orquestração é feita através da DAG `dag_01_ingestao_bronze.py`. 
+* **Estratégia de Backfilling:** Com o conceito de *Catchup* do Airflow acoplado à variável Jinja `{{ ds }}` (Execution Date) simula-se a passagem do tempo, processando o histórico de 2017 dia a dia de forma sequencial e controlada, injetando a data dinamicamente no comando Bash que chama o Spark. 
+
+**OBS**: Para que o python tenha acesso aos parâmetros do Airflow, devemos utilizar o args da lib nativa do python `sys`. Um exemplo de uso:
 ![Exemplo de uso do argv](<images/Screenshot from 2026-04-15 14-50-12.png>)
-
-Em primeiro lugar vamos importar os dados da nossa `raw_source` simulando a extracao diaria.  
-Nosso script `scripts/01_ingestao_bronze_pedidos.py` cria uma sessão do spark, captura os dados da `raw_source/olist_orders_dataset.csv`, trata a data e cria um arquivo **parquet** particionando pela coluna data para a pasta `data_lake/bronze/pedidos`.
-
