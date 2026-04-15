@@ -5,7 +5,7 @@
 Este projeto requer **Python 3.12** e **Java 11** (necessário para a JVM do Spark).
 
 ### 1. Preparação do Sistema
-Instalel do Java e gerenciadores do Python:
+Antes de tudo fiz as configurações do ambiente linux, baixando python, criando uma venv, conectando ao github e baixando o visual studio code como IDE.
 ```bash
 sudo apt install python3-pip python3-venv default-jdk -y
 ```
