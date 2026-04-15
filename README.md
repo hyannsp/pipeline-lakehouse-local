@@ -45,3 +45,16 @@ export AIFLOW_HOME=~/projeto-engenharia-dados/airflow
 # Iniciar o Webserver e o Scheduler do airflow
 airflow standalone
 ```
+
+## Fonte de Dados
+
+Vamos utilizar a fonte de dados da  Kaggle https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce, os CSVs foram baixados e inseridos na pasta `/raw_source`, dela vamos implementar a captura em batch pegando dados diarios (para simular a ingestão).
+
+## Processamento com Airflow e Spark
+### 1. Camada Bronze
+Para que o python tenha acesso aos parâmetros do Airflow, devemos utilizar o args da lib nativa do python `sys`. Um exemplo de uso:
+![Exemplo de uso do argv](<images/Screenshot from 2026-04-15 14-50-12.png>)
+
+Em primeiro lugar vamos importar os dados da nossa `raw_source` simulando a extracao diaria.  
+Nosso script `scripts/01_ingestao_bronze_pedidos.py` cria uma sessão do spark, captura os dados da `raw_source/olist_orders_dataset.csv`, trata a data e cria um arquivo **parquet** particionando pela coluna data para a pasta `data_lake/bronze/pedidos`.
+
