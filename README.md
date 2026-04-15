@@ -14,7 +14,7 @@ sudo apt install python3-pip python3-venv default-jdk -y
 Instalando dependências iniciais:
 ```bash
 pip install pyspark delta-spark # Pyspark e delta lake
-pip install "apache-airflow[celery,postgreesql,spark]==2.10.5" --upgrade
+pip install "apache-airflow[celery,postgresql,spark]==2.10.5" --upgrade
 ```
 
 ### 3. Inicialização do Airflow
