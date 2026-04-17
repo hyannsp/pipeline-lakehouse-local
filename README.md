@@ -93,3 +93,23 @@ Além da carga incremental diária da tabela fato (Pedidos), o pipeline conta co
 # Pega o CSV olist_products_dataset e transforma em um parquet 'produtos' com a coluna nova de '_data_ingestao'
 python3 scripts/02_ingestao_bronze_dimensoes.py olist_products_dataset produtos
 ```
+
+## 🥈 Fase 2: Processamento e Limpeza (Camada Silver)
+
+A Camada Silver é responsável pela higienização dos dados, aplicando regras de qualidade e convertendo os arquivos para o formato **Delta Lake**, garantindo transações ACID e *Idempotência* (capacidade de rodar o pipeline múltiplas vezes sem duplicar dados).
+
+### 1. Tabela Fato (Pedidos) - Estratégia de Upsert
+
+* **Script:** `scripts/03_processamento_silver_pedidos.py`
+* **Lógica:** O script lê a partição do dia correspondente da Bronze, remove registros com chaves nulas e remove dados duplicados.
+* **Delta Merge:** Utiliza o método `whenMatchedUpdateAll` e `whenNotMatchedInsertAll` para realizar um *Upsert* (Update + Insert) na Silver, evitando duplicação de dados em caso de reprocessamento.
+
+### 2. Tabelas de Dimensão - Script Dinâmico
+
+* **Script:** `scripts/04_processamento_silver_dimensoes.py`
+* **Lógica:** Um único script dinâmico capaz de limpar qualquer tabela de dimensão. Ele recebe o nome da tabela e sua respectiva chave primária (ou lista de chaves, como `order_id,order_item_id`) via `sys.argv`.
+* **Full Load:** Os dados são limpos e salvos na Silver sobrescrevendo o histórico anterior (`mode("overwrite")`), visto que são tabelas de atualização integral.
+
+### 3. Orquestração das Dimensões (Airflow)
+
+Foi criada a DAG `dag_02_pipeline_dimensoes.py` que paraleliza a execução das camadas Bronze e Silver para Clientes, Produtos e Itens do Pedido de forma diária, configurada com `catchup=False`.
