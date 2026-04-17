@@ -2,7 +2,7 @@ from airflow import DAG
 from datetime import datetime
 from airflow.operators.bash import BashOperator
 
-PYTHON_BIN = "home/klovys/Projects/pipeline-lakehouse-local/venv/bin/python"
+PYTHON_BIN = "/home/klovys/Projects/pipeline-lakehouse-local/venv/bin/python"
 SCRIPTS_DIR = "/home/klovys/Projects/pipeline-lakehouse-local/scripts"
 
 default_args = {
@@ -22,7 +22,7 @@ with DAG(
     # Tabelas clientes
     bronze_clientes = BashOperator(
         task_id = 'bronze_clientes',
-        bash_command=f"{PYTHON_BIN} {SCRIPTS_DIR}/02_ingestao_bronze_dimensoes.py olist_customer_dataset clientes"
+        bash_command=f"{PYTHON_BIN} {SCRIPTS_DIR}/02_ingestao_bronze_dimensoes.py olist_customers_dataset clientes"
     )
 
     silver_clientes = BashOperator(

@@ -3,3 +3,7 @@ __pycache__/
 *.db
 venv/
 raw_source/
+airflow/logs/
+airflow/*.pid
+airflow/*.err
+airflow/*.log

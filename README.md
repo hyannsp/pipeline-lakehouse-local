@@ -47,7 +47,7 @@ Sempre que for rodar o projeto, modificar, etc. Deve-se rodar o seguinte:
 source venv/bin/activate
 
 # Apontar airflow para a pasta correta
-export AIFLOW_HOME=~/projeto-engenharia-dados/airflow
+export AIRFLOW_HOME=~/Projects/pipeline-lakehouse-local/airflow
 
 # Iniciar o Webserver e o Scheduler do airflow
 airflow standalone
