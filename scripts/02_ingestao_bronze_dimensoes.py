@@ -7,7 +7,7 @@ from pyspark.sql.functions import col, to_date, current_timestamp, lit
     Ler o CSV correspondente ao raw_source (Nome passado como argumento)
 """
 
-if len(sys.argv) > 0:
+if len(sys.argv) > 1:
     csv_origem = sys.argv[1]
     parquet_destino = sys.argv[2] if len(sys.argv) > 2 else csv_origem
     print(f"Arquvio a ser processado: {csv_origem} ser'a salvo como : {parquet_destino}")
