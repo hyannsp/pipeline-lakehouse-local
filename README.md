@@ -113,3 +113,25 @@ A Camada Silver é responsável pela higienização dos dados, aplicando regras 
 ### 3. Orquestração das Dimensões (Airflow)
 
 Foi criada a DAG `dag_02_pipeline_dimensoes.py` que paraleliza a execução das camadas Bronze e Silver para Clientes, Produtos e Itens do Pedido de forma diária, configurada com `catchup=False`.
+
+## 🏆 Fase 3: Modelagem da Camada Gold
+
+Para a camada gold foi adotada a modelagem dimensional **Star Schema**, separando métricas e dimensões.
+
+### 1. Tabela Fato (Vendas)
+
+* **Script:** `scripts/05_modelagem_gold_fato_vendas.py`
+* **Lógica:** Realiza o cruzamento (`INNER JOIN`) entre as tabelas da Silver (`pedidos` e `itens_pedido`).
+* **Objetivo:** Centralizar as métricas quantitativas (como `valor_produto` e `valor_frete`) e as chaves estrangeiras, garantindo granularidade de item por pedido. O processo utiliza *Upsert* (Merge) baseado em chave composta para evitar duplicatas em reprocessamentos e aplica particionamento por data.
+
+### 2. Tabelas Dimensão (Clientes e Produtos)
+
+* **Script:** `scripts/06_modelagem_gold_dimensoes.py`
+* **Lógica:** Lê os dados limpos da Silver, seleciona as colunas focadas em regras de negócio e traduz a nomenclatura para o usuário final (ex: `customer_city` para `cidade`).
+* **Objetivo:** Fornecer o contexto para a tabela Fato. A atualização é feita aplicando o conceito de **SCD Tipo 1 (Slowly Changing Dimension)** através de *Upserts* do Delta Lake, mantendo o estado mais recente de cada entidade.
+
+### 3. Orquestração da Camada Gold (Sensores)
+
+* **DAG:** `dag_03_pipeline_gold.py`
+* **Lógica:** Implementa Orquestração de Segundo Nível utilizando o `ExternalTaskSensor`.
+* **Objetivo:** A DAG da Camada Gold inicia dinamicamente, mas suas tarefas ficam aguardando (Sensing) a conclusão bem-sucedida das DAGs de Pedidos e Dimensões.
