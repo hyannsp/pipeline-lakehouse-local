@@ -1,6 +1,7 @@
 from airflow import DAG
 from datetime import datetime
 from airflow.operators.bash import BashOperator
+from airflow.operators.empty import EmptyOperator
 
 PYTHON_BIN = "/home/klovys/Projects/pipeline-lakehouse-local/venv/bin/python"
 SCRIPTS_DIR = "/home/klovys/Projects/pipeline-lakehouse-local/scripts"
@@ -52,7 +53,12 @@ with DAG(
         bash_command=f"{PYTHON_BIN} {SCRIPTS_DIR}/04_processamento_silver_dimensoes.py itens_pedido order_id,order_item_id"
     )
 
+    # Task vazia para validacao de processamento
+    fim_processamento = EmptyOperator(
+        task_id="fim_processamento_dimensoes"
+    )
+
     # Ordem de execução
-    bronze_clientes >> silver_clientes
-    bronze_produtos >> silver_produtos
-    bronze_itens >> silver_itens
+    bronze_clientes >> silver_clientes >> fim_processamento
+    bronze_produtos >> silver_produtos >> fim_processamento
+    bronze_itens >> silver_itens >> fim_processamento
