@@ -10,7 +10,7 @@ from pyspark.sql.functions import col, lit
     ------------------------------
 """
 
-builder = SparkSession.builder.appName("processamento_silver_dimensoes") \
+builder = SparkSession.builder.appName("modelagem_gold_fato_vendas") \
     .master("local[*]") \
     .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
     .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
